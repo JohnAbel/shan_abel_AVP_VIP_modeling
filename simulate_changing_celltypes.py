@@ -1,11 +1,7 @@
 """
-Run model of the full SCN consisting of 60 Gonze oscillators. The period
-is found using the deterministic model to normalize the resulting trajectories.
-The initial conditions are random--these were hard-coded in to return an identical 
-figure every time, but they can be commented out for random start.
-
-
-Generate the final figure, save the trajectories.
+This file performs 100 simulations of WT, AVPBmalKO, VIPBmalKO for varying
+the AVP:VIP coupling strength ratios from 0.1 to 10. Files are saved in folder
+"data" for next step of processing.
 
 John Abel
 """
@@ -17,7 +13,6 @@ import numpy as np
 
 from local_imports import LimitCycle as lc
 from local_models import gonze_model as ab
-reload(ab)
 from local_models.gonze_model import param, ODEmodel, EqCount
 
 
@@ -37,34 +32,38 @@ totcells = AVPcells+VIPcells+NAVcells
 # switch to the many cell model
 from local_models import gonze_model_manycell as ab
 reload(ab)
-from local_models.gonze_model_stochastic_manycell import param, GonzeModelManyCells
+from local_models.gonze_stoch_multi_celltypes import param, GonzeModelManyCells
 
-def load_trajectories(kav):
+def load_trajectories(navp, nvip):
     """
     Loads simulated trajectories
     """
     # try to load the simulation
     try:    
-        with open("Data/wt_"+str(kav)+".pickle", "rb") as read_file:
+        with open("data/celltypes/wt_"+str(navp)+
+                  "_"+str(nvip)+".pickle", "rb") as read_file:
             wt_trajectories = pickle.load(read_file)
-        with open("Data/avp_"+str(kav)+".pickle", "rb") as read_file:
+        with open("data/celltypes/avp_"+str(navp)+
+                  "_"+str(nvip)+".pickle", "rb") as read_file:
             avp_trajectories = pickle.load(read_file)
-        with open("Data/vip_"+str(kav)+".pickle", "rb") as read_file:
+        with open("data/celltypes/vip_"+str(navp)+
+                  "_"+str(nvip)+".pickle", "rb") as read_file:
             vip_trajectories = pickle.load(read_file)
-        print "Loaded "+str(kav)
+        print "Loaded "+str(navp)+str(nvip)
 
     except IOError:
-        print str(kav)+" does not exist yet."
+        print str(navp)+str(nvip)+" does not exist yet."
 
     return {'wt': wt_trajectories,
             'avp': avp_trajectories,
             'vip': vip_trajectories}
 
-def simulate_trajectories(kav):
+def simulate_trajectories(navp):
     """
     Simulates and saves desired trajectories.
     """
-    print "Simulating "+str(kav)
+    nvip = 40-navp
+    print "Simulating "+str(navp)+" "+str(nvip)
     wt_trajectories = []
     avp_trajectories = []
     vip_trajectories = []
@@ -78,37 +77,40 @@ def simulate_trajectories(kav):
         y0_random = np.hstack(init_conditions_AV+init_conditions_NAV)
 
         # do the simulation
-        model = GonzeModelManyCells(param, kav=kav, 
-            initial_values=y0_random)
+        model = GonzeModelManyCells(param, AVPcells=navp,
+                VIPcells=nvip, initial_values=y0_random)
         wt_trajectories.append(model.run(show_labels=False, seed=0))
 
         # avp bmalko
-        avp_model = GonzeModelManyCells(param, bmalko='AVP', kav=kav, 
-            initial_values=y0_random)
+        avp_model = GonzeModelManyCells(param, bmalko='AVP', AVPcells=navp,
+                VIPcells=nvip, initial_values=y0_random)
         avp_trajectories.append(avp_model.run(show_labels=False, seed=0))
 
         # vip bmalko
-        vip_model = GonzeModelManyCells(param, bmalko='VIP', kav=kav, 
-            initial_values=y0_random)
+        vip_model = GonzeModelManyCells(param, bmalko='VIP', AVPcells=navp,
+                VIPcells=nvip, initial_values=y0_random)
         vip_trajectories.append(vip_model.run(show_labels=False, seed=0))
 
     # save results
-    with open("Data/wt_"+str(kav)+".pickle", "wb") as output_file:
+    with open("data/celltypes/wt_"+str(navp)+
+                  "_"+str(nvip)+".pickle", "wb") as output_file:
             pickle.dump(wt_trajectories, output_file)
-    with open("Data/avp_"+str(kav)+".pickle", "wb") as output_file:
+    with open("data/celltypes/avp_"+str(navp)+
+                  "_"+str(nvip)+".pickle", "wb") as output_file:
             pickle.dump(avp_trajectories, output_file)
-    with open("Data/vip_"+str(kav)+".pickle", "wb") as output_file:
+    with open("data/celltypes/vip_"+str(navp)+
+                  "_"+str(nvip)+".pickle", "wb") as output_file:
             pickle.dump(vip_trajectories, output_file)
 
     return {'wt': wt_trajectories,
             'avp': avp_trajectories,
             'vip': vip_trajectories}
 
-kavs = [0.1, 0.2, 0.5, 1, 2, 5, 10]
+navps = [4, 7, 13, 20, 27, 33, 36]
 
-for kav in kavs:
-    simulate_trajectories(kav)
-    traj = load_trajectories(kav)
+for navp in navps:
+    simulate_trajectories(navp)
+    traj = load_trajectories(navp, 40-navp)
 
 
 print "All trajectories simulated successfully."

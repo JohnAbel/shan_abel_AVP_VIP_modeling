@@ -22,7 +22,7 @@ from local_imports import PlotOptions as plo
 kavs = [0.1, 0.2, 0.5, 1, 2, 5, 10]
 
 # load the results
-with open("data/mic_results.pickle", "rb") as input_file:
+with open("data/params/mic_results.pickle", "rb") as input_file:
     results = pickle.load(input_file)
 
 
@@ -78,5 +78,5 @@ ax.set_ylim([0.2, 0.7])
 ax.set_xlim([0.07, 18])
 plt.tight_layout(**plo.layout_pad)
 
-plt.savefig('results/stats_fig.svg')
+plt.savefig('results/params_stats_fig.svg')
 plt.show()

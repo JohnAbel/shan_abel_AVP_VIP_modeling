@@ -16,9 +16,15 @@ full list of dependencies are as follows:
 | minepy | 1.2.2 |
 
 To generate the example trajectories of Fig 6, run `example_5x_scn.py`.
+
 To perform the parameter sweep for relative coupling strength, run 
 `simulate_changing_coupling.py`, followed by `perform_mic_calculation.py` for
 calculating MIC, then `stats_changing_parameter.py` for the statistical 
 analysis and Fig S9C.
+
+To perform the sweep for relative fractions of AVP and VIP cells with equal
+coupling strength, run `simulate_changing_celltypes.py` followed by 
+`perform_mic_calculation.py` for calculating MIC, then 
+`stats_changing_celltypes.py` for the statistical analysis and Fig S9C.
 
 For questions, contact jhabel01 at gmail dot com.
