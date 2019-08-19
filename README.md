@@ -16,9 +16,13 @@ full list of dependencies are as follows:
 | minepy | 1.2.2 |
 
 To generate the example trajectories of Fig 6, run `example_5x_scn.py`.
-To perform the parameter sweep for relative coupling strength, run 
-`simulate_changing_coupling.py`, followed by `perform_mic_calculation.py` for
+
+To perform the parameter sweep for neurotransmission pathway strength, run 
+`simulate_changing_parameter.py`, and to perform the parameter sweep for
+ratios of cell types, run `simulate_changing_celltypes.py`.
+
+Once these simulationa are run, use `perform_mic_calculation.py` for
 calculating MIC, then `stats_changing_parameter.py` for the statistical 
-analysis and Fig S9C.
+analysis and Fig 5.
 
 For questions, contact jhabel01 at gmail dot com.

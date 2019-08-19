@@ -1,11 +1,11 @@
 """
 Run model of the full SCN consisting of 60 Gonze oscillators. The period
 is found using the deterministic model to normalize the resulting trajectories.
-The initial conditions are random--these were hard-coded in to return an identical 
-figure every time, but they can be commented out for random start.
+The initial conditions are random--these were hard-coded in to return an 
+identical figure every time, but they can be commented out for random start.
 
-
-Generate the final figure, save the trajectories.
+Generates for final figure of example trajectories from the paper with a 
+5:1 AVP:VIP coupling strength ratio.
 
 John Abel
 """
@@ -24,7 +24,6 @@ from matplotlib import gridspec
 from local_imports import LimitCycle as lc
 from local_imports import PlotOptions as plo
 from local_models import gonze_model as ab
-reload(ab)
 from local_models.gonze_model import y0in, param, ODEmodel, EqCount, ParamCount
 
 
@@ -97,15 +96,13 @@ y0_random = np.array(
 
 
 
-# switch to the many cell model
-from local_models import gonze_model_manycell as ab
-reload(ab)
-from local_models.gonze_model_stochastic_manycell import param, GonzeModelManyCells
+# switch to the multicellular stochastic model
+from local_models.gonze_stoch_multi_params import param, GonzeModelManyCells
 
 # note that these relative strengths only are about IN THE ABSENCE OF THE OTHER
 
 # make the stochastic figure
-model = GonzeModelManyCells(param)
+model = GonzeModelManyCells(param, kav=5)
 wt_trajectories = model.run(show_labels=False, seed=0)
 wt_ts = wt_trajectories[0][:,0]
 wt_avpsol = wt_trajectories[0][:,1:(80+1)]
@@ -113,14 +110,14 @@ wt_vipsol = wt_trajectories[0][:,(80+1):(160+1)]
 wt_navsol = wt_trajectories[0][:,(160+1):]
 
 # avp bmalko
-avp_model = GonzeModelManyCells(param, bmalko='AVP')
+avp_model = GonzeModelManyCells(param, kav=5, bmalko='AVP')
 avp_trajectories = avp_model.run(show_labels=False, seed=0)
 avp_ts = avp_trajectories[0][:,0]
 avp_avpsol = avp_trajectories[0][:,1:(80+1)]
 avp_vipsol = avp_trajectories[0][:,(80+1):(160+1)]
 avp_navsol = avp_trajectories[0][:,(160+1):]
 
-vip_model = GonzeModelManyCells(param, bmalko='VIP')
+vip_model = GonzeModelManyCells(param, kav=5, bmalko='VIP')
 vip_trajectories = vip_model.run(show_labels=False, seed=0)
 vip_ts = vip_trajectories[0][:,0]
 vip_avpsol = vip_trajectories[0][:,1:(80+1)]
@@ -128,7 +125,7 @@ vip_vipsol = vip_trajectories[0][:,(80+1):(160+1)]
 vip_navsol = vip_trajectories[0][:,(160+1):]
 
 
-
+# figure
 plo.PlotOptions(ticks='in')
 plt.figure(figsize=(3.5,3))
 gs = gridspec.GridSpec(3,1)
