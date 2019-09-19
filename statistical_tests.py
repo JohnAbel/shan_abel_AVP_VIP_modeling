@@ -40,7 +40,7 @@ for r in results:
     u_results.append([wa, wv, av])
 u_results = np.array(u_results)*21
 
-correct_phenotype = [np.all([ur[0]<0.05, ur[1]>0.05, ur[2]<0.05]) 
+correct_phenotype1 = [np.all([ur[0]<0.05, ur[1]>0.05, ur[2]<0.05]) 
                         for ur in u_results]
 
 # plot the figure
@@ -52,15 +52,15 @@ ax = plt.subplot(gs[0, 0])
 
 for idx, kav in enumerate(kavs):
     l1 = ax.plot(plo.jitter_uni([kav]*100, x_range=kav/10),
-                 results[idx][0], 'o', c='k', alpha=0.12)
+                 results[idx][0], 'o', c='k', alpha=0.5)
 
 for idx, kav in enumerate(kavs):
     l2 = ax.plot(plo.jitter_uni([kav]*100, x_range=kav/10),
-                 results[idx][1], 'o', c='j', alpha=0.12)
+                 results[idx][1], 'o', c='j', alpha=0.5)
 
 for idx, kav in enumerate(kavs):
     l3 = ax.plot(plo.jitter_uni([kav]*100, x_range=kav/10),
-                 results[idx][2], 'fo', alpha=0.12)
+                 results[idx][2], 'fo', alpha=0.5)
 
 ax.plot(kavs, [np.mean(r[0]) for r in results], 'k', label='WT Mean')
 ax.plot(kavs, [np.mean(r[1]) for r in results], 'j', label='AVPBmal1KO Mean')
@@ -76,7 +76,7 @@ ax.set_ylim([0.2, 0.7])
 ax.set_xlim([0.07, 18])
 plt.tight_layout(**plo.layout_pad)
 
-plt.savefig('results/params_stats_fig.svg')
+plt.savefig('results/params_stats_fig.pdf')
 plt.show()
 
 
@@ -108,7 +108,7 @@ for r in results:
     u_results.append([wa, wv, av])
 u_results = np.array(u_results)*21
 
-correct_phenotype = [np.all([ur[0]<0.05, ur[1]>0.05, ur[2]<0.05]) 
+correct_phenotype2 = [np.all([ur[0]<0.05, ur[1]>0.05, ur[2]<0.05]) 
                         for ur in u_results]
 
 # plot the figure
@@ -120,15 +120,15 @@ ax = plt.subplot(gs[0, 0])
 
 for idx, kav in enumerate(kavs):
     l1 = ax.plot(plo.jitter_uni([kav]*100, x_range=kav/10),
-                 results[idx][0], 'o', c='k', alpha=0.12)
+                 results[idx][0], 'o', c='k', alpha=0.5)
 
 for idx, kav in enumerate(kavs):
     l2 = ax.plot(plo.jitter_uni([kav]*100, x_range=kav/10),
-                 results[idx][1], 'o', c='j', alpha=0.12)
+                 results[idx][1], 'o', c='j', alpha=0.5)
 
 for idx, kav in enumerate(kavs):
     l3 = ax.plot(plo.jitter_uni([kav]*100, x_range=kav/10),
-                 results[idx][2], 'fo', alpha=0.12)
+                 results[idx][2], 'fo', alpha=0.5)
 
 ax.plot(type_ratios, [np.mean(r[0]) for r in results], 'k', label='WT Mean')
 ax.plot(type_ratios, [np.mean(r[1]) for r in results], 'j', 
@@ -146,6 +146,6 @@ ax.set_ylim([0.2, 0.7])
 ax.set_xlim([0.07, 18])
 plt.tight_layout(**plo.layout_pad)
 
-plt.savefig('results/celltypes_stats_fig.svg')
+plt.savefig('results/celltypes_stats_fig.pdf')
 plt.show()
 
