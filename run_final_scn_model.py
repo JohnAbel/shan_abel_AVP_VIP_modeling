@@ -36,7 +36,8 @@ wt_T = single_osc.T
 single_osc.limit_cycle()
 
 # number of each celltype
-AVPcells = 20; VIPcells=20; NAVcells = 20
+# these and the kav are hard-coded into the model
+AVPcells = 27; VIPcells=13; NAVcells = 20
 totcells = AVPcells+VIPcells+NAVcells
 
 # initial phases
@@ -101,7 +102,7 @@ from local_models.stoch_model_final import param, GonzeModelManyCells
 # note that these relative strengths only are about IN THE ABSENCE OF THE OTHER
 
 # make the stochastic figure
-model = GonzeModelManyCells(param, kav=5)
+model = GonzeModelManyCells(param)
 wt_trajectories = model.run(show_labels=False, seed=0)
 wt_ts = wt_trajectories[0][:,0]
 wt_avpsol = wt_trajectories[0][:,1:(80+1)]
@@ -109,14 +110,14 @@ wt_vipsol = wt_trajectories[0][:,(80+1):(160+1)]
 wt_navsol = wt_trajectories[0][:,(160+1):]
 
 # avp bmalko
-avp_model = GonzeModelManyCells(param, kav=5, bmalko='AVP')
+avp_model = GonzeModelManyCells(param, bmalko='AVP')
 avp_trajectories = avp_model.run(show_labels=False, seed=0)
 avp_ts = avp_trajectories[0][:,0]
 avp_avpsol = avp_trajectories[0][:,1:(80+1)]
 avp_vipsol = avp_trajectories[0][:,(80+1):(160+1)]
 avp_navsol = avp_trajectories[0][:,(160+1):]
 
-vip_model = GonzeModelManyCells(param, kav=5, bmalko='VIP')
+vip_model = GonzeModelManyCells(param, bmalko='VIP')
 vip_trajectories = vip_model.run(show_labels=False, seed=0)
 vip_ts = vip_trajectories[0][:,0]
 vip_avpsol = vip_trajectories[0][:,1:(80+1)]
@@ -176,30 +177,30 @@ cx.set_xlabel('Day')
 
 plt.legend()
 plt.tight_layout(**plo.layout_pad)
-plt.savefig('results/model_figure_data.svg')
+plt.savefig('results/model_figure_data.pdf')
 plt.show()
 
-# # export data
-# header = ['TimesH', 'Frame']+['AVP'+str(i) for i in range(AVPcells)]+['VIP'+str(i) for i in range(VIPcells)]+['NAV'+str(i) for i in range(NAVcells)]
 
+# export data
+header = ['TimesH', 'Frame']+['AVP'+str(i) for i in range(AVPcells)]+['VIP'+str(i) for i in range(VIPcells)]+['NAV'+str(i) for i in range(NAVcells)]
 
-# # wt traces
-# output_data = np.hstack([np.array([wt_ts*24/wt_T]).T,  np.array([np.arange(len(wt_ts))]).T, wt_avpsol[:,::4], wt_vipsol[:,::4], wt_navsol[:,::3] ])
-# output_df = pd.DataFrame(data=output_data,
-#             columns = header)
-# output_df.to_csv('Results/WT_stochastic_resync.csv', index=False)
+# wt traces
+output_data = np.hstack([np.array([wt_ts*24/wt_T]).T,  np.array([np.arange(len(wt_ts))]).T, wt_avpsol[:,::4], wt_vipsol[:,::4], wt_navsol[:,::3] ])
+output_df = pd.DataFrame(data=output_data,
+            columns = header)
+output_df.to_csv('results/WT_finalmodel_trajectories.csv', index=False)
 
-# # avp traces
-# output_data = np.hstack([np.array([avp_ts*24/wt_T]).T, np.array([np.arange(len(avp_ts))]).T, avp_avpsol[:,::4], avp_vipsol[:,::4], avp_navsol[:,::3] ])
-# output_df = pd.DataFrame(data=output_data,
-#             columns = header)
-# output_df.to_csv('Results/AVPBmalKO_stochastic_resync.csv', index=False)
+# avp traces
+output_data = np.hstack([np.array([avp_ts*24/wt_T]).T, np.array([np.arange(len(avp_ts))]).T, avp_avpsol[:,::4], avp_vipsol[:,::4], avp_navsol[:,::3] ])
+output_df = pd.DataFrame(data=output_data,
+            columns = header)
+output_df.to_csv('results/AVPBmalKO_finalmodel_trajectories.csv', index=False)
 
-# # vip traces
-# output_data = np.hstack([np.array([vip_ts*24/wt_T]).T, np.array([np.arange(len(vip_ts))]).T, vip_avpsol[:,::4], vip_vipsol[:,::4], vip_navsol[:,::3] ])
-# output_df = pd.DataFrame(data=output_data,
-#             columns = header)
-# output_df.to_csv('Results/VIPBmalKO_stochastic_resync.csv', index=False)
+# vip traces
+output_data = np.hstack([np.array([vip_ts*24/wt_T]).T, np.array([np.arange(len(vip_ts))]).T, vip_avpsol[:,::4], vip_vipsol[:,::4], vip_navsol[:,::3] ])
+output_df = pd.DataFrame(data=output_data,
+            columns = header)
+output_df.to_csv('results/VIPBmalKO_finalmodel_trajectories.csv', index=False)
 
 
 

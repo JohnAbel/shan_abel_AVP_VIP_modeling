@@ -74,12 +74,12 @@ period = 35.111795693955706
 class GonzeModelManyCells(gsp.Model):
     """ Stochastic version of the ODE model. Contains 60 cells."""
     def __init__(self, parameter_values=param, initial_values=y0in, 
-                 bmalko='None', AVPcells=20, VIPcells=20):
+                 bmalko='None', AVPcells=27, VIPcells=13):
         """
         """
         assert AVPcells+VIPcells==40, \
                  "Total cells involved in signaling !=40."
-        kav =1 # equal strength of VIP and AVP
+        kav = 2.5 # 2.5 AVP:1VIP
         sv = 1000 #system volume
         gsp.Model.__init__(self, name="gonze60", volume=sv)
         self.timespan(np.linspace(0,7*period,7*4*24+1))
