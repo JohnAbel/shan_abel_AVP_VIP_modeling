@@ -5,7 +5,7 @@ The initial conditions are random--these were hard-coded in to return an
 identical figure every time, but they can be commented out for random start.
 
 Generates for final figure of example trajectories from the paper with a 
-5:1 AVP:VIP coupling strength ratio.
+2.5:1 AVP:VIP coupling strength ratio, and a 2:1 AVP:VIP cell count ratio.
 
 John Abel
 """

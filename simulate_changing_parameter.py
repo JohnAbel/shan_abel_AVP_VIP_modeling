@@ -12,7 +12,6 @@ import pickle
 import numpy as np
 
 from local_imports import LimitCycle as lc
-from local_models import gonze_model as ab
 from local_models.gonze_model import param, ODEmodel, EqCount
 
 
@@ -30,8 +29,6 @@ totcells = AVPcells+VIPcells+NAVcells
 
 # perform sim ulation
 # switch to the many cell model
-from local_models import gonze_model_manycell as ab
-reload(ab)
 from local_models.gonze_stoch_multi_params import param, GonzeModelManyCells
 
 def load_trajectories(kav):
