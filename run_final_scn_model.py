@@ -13,6 +13,8 @@ John Abel
 from __future__ import division
 import sys
 assert sys.version[0]=='2', "This file must be run in python 2"
+import pickle
+from itertools import combinations
 
 import numpy as np
 import scipy as sp
@@ -20,6 +22,7 @@ import casadi as cs
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
+import minepy as mp
 
 from local_imports import LimitCycle as lc
 from local_imports import PlotOptions as plo
@@ -37,7 +40,7 @@ single_osc.limit_cycle()
 
 # number of each celltype
 # these and the kav are hard-coded into the model
-AVPcells = 27; VIPcells=13; NAVcells = 20
+AVPcells = 53; VIPcells=27; NAVcells = 40
 totcells = AVPcells+VIPcells+NAVcells
 
 # initial phases
@@ -46,53 +49,8 @@ init_conditions_AV  = [single_osc.lc(wt_T*np.random.rand())
 init_conditions_NAV = [single_osc.lc(wt_T*np.random.rand())[:-1]
                         for i in range(NAVcells)]
 
-#y0_random = np.hstack(init_conditions_AV+init_conditions_NAV)
+y0_random = np.hstack(init_conditions_AV+init_conditions_NAV)
 # so that figure is identical use the one actually generated
-y0_random = np.array(
-      [0.03649647, 0.10663466, 2.60469301, 0.01192638, 0.15020802,
-       0.19639209, 1.699136  , 0.04282985, 0.17498466, 0.22961959,
-       1.65447964, 0.05062847, 0.27392133, 0.44823915, 1.69886225,
-       0.09175747, 0.09678593, 0.5411219 , 3.46699745, 0.04373477,
-       0.10162063, 0.14110837, 1.85774339, 0.02871033, 0.06361829,
-       0.10819374, 2.11877411, 0.0185076 , 0.2658215 , 0.634519  ,
-       2.10819409, 0.10519723, 0.03096468, 0.13758529, 2.97860106,
-       0.01136174, 0.05646195, 0.1040406 , 2.20016264, 0.01667297,
-       0.1366907 , 0.17977646, 1.73219853, 0.03876298, 0.19068233,
-       0.69110311, 2.75665085, 0.08382894, 0.05829896, 0.37983743,
-       3.60568227, 0.0258205 , 0.09417055, 0.53273561, 3.48273887,
-       0.04253476, 0.03570413, 0.10808946, 2.63461023, 0.0117711 ,
-       0.28179642, 0.56138241, 1.88543179, 0.10383703, 0.11665168,
-       0.59565689, 3.33402542, 0.05275335, 0.11974919, 0.16030203,
-       1.7844304 , 0.03382388, 0.12658435, 0.61753486, 3.26144801,
-       0.05718728, 0.03193911, 0.17491349, 3.20998031, 0.01257403,
-       0.04458828, 0.10106302, 2.38934048, 0.01373802, 0.03436042,
-       0.20631866, 3.33939272, 0.01403256, 0.28076279, 0.49189016,
-       1.75574768, 0.0974223 , 0.17125861, 0.67995127, 2.91303202,
-       0.07621747, 0.09305787, 0.13268258, 1.90077683, 0.02635128,
-       0.03093859, 0.13870795, 2.98752288, 0.01138396, 0.23254463,
-       0.32751211, 1.62028786, 0.07131719, 0.07344282, 0.11536166,
-       2.02984124, 0.02107731, 0.03316637, 0.19232516, 3.28694656,
-       0.01334854, 0.16865091, 0.22075213, 1.66411195, 0.04858779,
-       0.10453018, 0.14406946, 1.84449061, 0.02951992, 0.05530311,
-       0.36288311, 3.6013551 , 0.0243991 , 0.03799234, 0.24170443,
-       3.44350626, 0.01595947, 0.03255529, 0.11877973, 2.7951997 ,
-       0.01127483, 0.04080215, 0.26524999, 3.49495685, 0.01737934,
-       0.03095935, 0.13779727, 2.98029873, 0.01136584, 0.06170946,
-       0.39814127, 3.60625163, 0.02743211, 0.18540888, 0.24484723,
-       1.64112094, 0.05406722, 0.0372021 , 0.10556097, 2.5800791 ,
-       0.01207008, 0.25520479, 0.6565869 , 2.21238126, 0.1035541 ,
-       0.17709525, 0.23263695, 1.65152703, 0.05028992, 0.33242437,
-       3.58392194, 0.06929097, 0.43548697, 3.59463344, 0.04627113,
-       0.10100334, 2.35641368, 0.12577388, 0.16705929, 1.76430733,
-       0.28085039, 0.57109287, 1.90849285, 0.0996584 , 0.54998659,
-       3.44913621, 0.03121411, 0.16046703, 3.1335892 , 0.17179048,
-       0.22511317, 1.65919141, 0.05515041, 0.36199537, 3.60102535,
-       0.21525365, 0.29388882, 1.6198416 , 0.0493198 , 0.10139819,
-       2.30291576, 0.06848032, 0.43169606, 3.59658506, 0.18030285,
-       0.68627538, 2.84042064, 0.06126784, 0.10670654, 2.14364334,
-       0.03377758, 0.11327042, 2.7216808 , 0.21964986, 0.30198587,
-       1.61895939, 0.10876944, 0.57584794, 3.38915257, 0.14186617,
-       0.18602192, 1.71872694, 0.28201589, 0.55856572, 1.87901187])
 
 
 
@@ -102,27 +60,27 @@ from local_models.stoch_model_final import param, GonzeModelManyCells
 # note that these relative strengths only are about IN THE ABSENCE OF THE OTHER
 
 # make the stochastic figure
-model = GonzeModelManyCells(param)
+model = GonzeModelManyCells(param, initial_values=y0_random)
 wt_trajectories = model.run(show_labels=False, seed=0)
 wt_ts = wt_trajectories[0][:,0]
-wt_avpsol = wt_trajectories[0][:,1:(80+1)]
-wt_vipsol = wt_trajectories[0][:,(80+1):(160+1)]
-wt_navsol = wt_trajectories[0][:,(160+1):]
+wt_avpsol = wt_trajectories[0][:,1:(AVPcells*4+1)]
+wt_vipsol = wt_trajectories[0][:,(AVPcells*4+1):(AVPcells*4+VIPcells*4+1)]
+wt_navsol = wt_trajectories[0][:,(AVPcells*4+VIPcells*4+1):]
 
 # avp bmalko
-avp_model = GonzeModelManyCells(param, bmalko='AVP')
+avp_model = GonzeModelManyCells(param, initial_values=y0_random, bmalko='AVP')
 avp_trajectories = avp_model.run(show_labels=False, seed=0)
 avp_ts = avp_trajectories[0][:,0]
-avp_avpsol = avp_trajectories[0][:,1:(80+1)]
-avp_vipsol = avp_trajectories[0][:,(80+1):(160+1)]
-avp_navsol = avp_trajectories[0][:,(160+1):]
+avp_avpsol = avp_trajectories[0][:,1:(AVPcells*4+1)]
+avp_vipsol = avp_trajectories[0][:,(AVPcells*4+1):(AVPcells*4+VIPcells*4+1)]
+avp_navsol = avp_trajectories[0][:,(320+1):]
 
-vip_model = GonzeModelManyCells(param, bmalko='VIP')
+vip_model = GonzeModelManyCells(param, initial_values=y0_random, bmalko='VIP')
 vip_trajectories = vip_model.run(show_labels=False, seed=0)
 vip_ts = vip_trajectories[0][:,0]
-vip_avpsol = vip_trajectories[0][:,1:(80+1)]
-vip_vipsol = vip_trajectories[0][:,(80+1):(160+1)]
-vip_navsol = vip_trajectories[0][:,(160+1):]
+vip_avpsol = vip_trajectories[0][:,1:(AVPcells*4+1)]
+vip_vipsol = vip_trajectories[0][:,(AVPcells*4+1):(AVPcells*4+VIPcells*4+1)]
+vip_navsol = vip_trajectories[0][:,(AVPcells*4+VIPcells*4+1):]
 
 
 # figure
@@ -211,11 +169,11 @@ output_df.to_csv('results/VIPBmalKO_finalmodel_trajectories.csv', index=False)
 
 # try to load the simulation
 try:    
-    with open("data/celltypes/wt_final.pickle", "rb") as read_file:
+    with open("data/wt_final.pickle", "rb") as read_file:
         wt_trajectories = pickle.load(read_file)
-    with open("data/celltypes/avp_final.pickle", "rb") as read_file:
+    with open("data/avp_final.pickle", "rb") as read_file:
         avp_trajectories = pickle.load(read_file)
-    with open("data/celltypes/vip_final.pickle", "rb") as read_file:
+    with open("data/vip_final.pickle", "rb") as read_file:
         vip_trajectories = pickle.load(read_file)
     print "Loaded final simulation."
     traj = {'wt': wt_trajectories,
@@ -228,6 +186,7 @@ except IOError:
     avp_trajectories = []
     vip_trajectories = []
     for tn in range(100):
+        print tn,
         # get random initial condition
         # initial phases
         init_conditions_AV  = [single_osc.lc(wt_T*np.random.rand()) 
@@ -251,11 +210,11 @@ except IOError:
         vip_trajectories.append(vip_model.run(show_labels=False, seed=0))
 
     # save results
-    with open("data/celltypes/wt_final.pickle", "wb") as output_file:
+    with open("data/wt_final.pickle", "wb") as output_file:
             pickle.dump(wt_trajectories, output_file)
-    with open("data/celltypes/avp_final.pickle", "wb") as output_file:
+    with open("data/avp_final.pickle", "wb") as output_file:
             pickle.dump(avp_trajectories, output_file)
-    with open("data/celltypes/vip_final.pickle", "wb") as output_file:
+    with open("data//vip_final.pickle", "wb") as output_file:
             pickle.dump(vip_trajectories, output_file)
 
     traj = {'wt': wt_trajectories,
@@ -293,26 +252,29 @@ except IOError:
         return mic_values
 
     # process wt
+    print "WT"
     wt_traj = traj['wt']
     wt = []
     for idx, ti in enumerate(wt_traj):
-        print idx
+        print idx,
         mic_mean = np.mean(mic_of_simulation(ti[0]))
         wt.append(mic_mean)
 
     # process avp
+    print "AVP-BmalKO"
     avp_traj = traj['avp']
     avp = []
     for idx, ti in enumerate(avp_traj):
-        print idx
+        print idx,
         mic_mean = np.mean(mic_of_simulation(ti[0]))
         avp.append(mic_mean)
 
     # process vip
+    print "VIP-BamelKO"
     vip_traj = traj['vip']
     vip = []
     for idx, ti in enumerate(vip_traj):
-        print idx
+        print idx,
         mic_mean = np.mean(mic_of_simulation(ti[0]))
         vip.append(mic_mean)
 
