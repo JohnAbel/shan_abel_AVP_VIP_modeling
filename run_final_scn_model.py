@@ -205,17 +205,141 @@ output_df.to_csv('results/VIPBmalKO_finalmodel_trajectories.csv', index=False)
 
 
 
+##############################################################################
+# perform simulations and statistical tests
+##############################################################################
+
+# try to load the simulation
+try:    
+    with open("data/celltypes/wt_final.pickle", "rb") as read_file:
+        wt_trajectories = pickle.load(read_file)
+    with open("data/celltypes/avp_final.pickle", "rb") as read_file:
+        avp_trajectories = pickle.load(read_file)
+    with open("data/celltypes/vip_final.pickle", "rb") as read_file:
+        vip_trajectories = pickle.load(read_file)
+    print "Loaded final simulation."
+    traj = {'wt': wt_trajectories,
+              'avp': avp_trajectories,
+              'vip': vip_trajectories}
+except IOError:
+    print "Final simulation does not exist yet."
+    print "Simulating 100 iterations of final model."
+    wt_trajectories = []
+    avp_trajectories = []
+    vip_trajectories = []
+    for tn in range(100):
+        # get random initial condition
+        # initial phases
+        init_conditions_AV  = [single_osc.lc(wt_T*np.random.rand()) 
+                                for i in range(AVPcells+VIPcells)]
+        init_conditions_NAV = [single_osc.lc(wt_T*np.random.rand())[:-1]
+                                for i in range(NAVcells)]
+        y0_random = np.hstack(init_conditions_AV+init_conditions_NAV)
+
+        # do the simulation
+        model = GonzeModelManyCells(param, initial_values=y0_random)
+        wt_trajectories.append(model.run(show_labels=False, seed=0))
+
+        # avp bmalko
+        avp_model = GonzeModelManyCells(param, bmalko='AVP', 
+                                        initial_values=y0_random)
+        avp_trajectories.append(avp_model.run(show_labels=False, seed=0))
+
+        # vip bmalko
+        vip_model = GonzeModelManyCells(param, bmalko='VIP', 
+                                        initial_values=y0_random)
+        vip_trajectories.append(vip_model.run(show_labels=False, seed=0))
+
+    # save results
+    with open("data/celltypes/wt_final.pickle", "wb") as output_file:
+            pickle.dump(wt_trajectories, output_file)
+    with open("data/celltypes/avp_final.pickle", "wb") as output_file:
+            pickle.dump(avp_trajectories, output_file)
+    with open("data/celltypes/vip_final.pickle", "wb") as output_file:
+            pickle.dump(vip_trajectories, output_file)
+
+    traj = {'wt': wt_trajectories,
+              'avp': avp_trajectories,
+              'vip': vip_trajectories}
+
+
+# MIC Calculations
+try:
+    # load the results
+    with open("results/finalmodel_mic_results.pickle", "rb") as input_file:
+        results = pickle.load(input_file)
+except IOError:
+    print "MIC has not been calculated yet."
+    print "Performing MIC calcualtion."
+    # now perform MIC calculation
+    def mic_of_simulation(trajectories):
+        """
+        returns the MIC values for one set of the SCN trajectories in question
+        """
+
+        avpvipsol = trajectories[:, 1:(160+1)]
+        navsol = trajectories[:, (160+1):]
+
+        per2 = np.hstack([avpvipsol[:, ::4], navsol[:, ::3]])
+        numcells = per2.shape[1]
+
+        # set up mic calculator
+        mic = mp.MINE(alpha=0.6, c=15, est='mic_approx')
+        mic_values = []
+        for combo in combinations(range(numcells), 2):
+            mic.compute_score(per2[:, combo[0]], per2[:, combo[1]])
+            mic_values.append(mic.mic())
+
+        return mic_values
+
+    # process wt
+    wt_traj = traj['wt']
+    wt = []
+    for idx, ti in enumerate(wt_traj):
+        print idx
+        mic_mean = np.mean(mic_of_simulation(ti[0]))
+        wt.append(mic_mean)
+
+    # process avp
+    avp_traj = traj['avp']
+    avp = []
+    for idx, ti in enumerate(avp_traj):
+        print idx
+        mic_mean = np.mean(mic_of_simulation(ti[0]))
+        avp.append(mic_mean)
+
+    # process vip
+    vip_traj = traj['vip']
+    vip = []
+    for idx, ti in enumerate(vip_traj):
+        print idx
+        mic_mean = np.mean(mic_of_simulation(ti[0]))
+        vip.append(mic_mean)
+
+    results = [wt, avp, vip]
+
+    with open("results/finalmodel_mic_results.pickle", "wb") as output_file:
+        pickle.dump(results, output_file)
 
 
 
+# run the stats
+# compare avpbmalko and vipbmalko vs. wt for all cases
+# running a mann-whitney U test for nonparametric comparison
+# recap of phenotypes is: AVPBmal1ko < VIPBmal1KO = WT
+# signifiance of p < 0.05
+# correct p-values with Bonferroni correction
+# at each level, we are comparing: WT:AVP, WT:VIP, VIP:AVP so 3*7=21
+# comparisons
 
-
-
-
-
-
-
-
+r = results
+wa = stats.mannwhitneyu(r[0], r[1], alternative='two-sided')[1]
+wv = stats.mannwhitneyu(r[0], r[2], alternative='two-sided')[1]
+av = stats.mannwhitneyu(r[1], r[2], alternative='two-sided')[1]
+u_results = [wa, wv, av]
+print u_results
+correct_phenotype1 = [np.all([ur[0]<0.05, ur[1]>0.05, ur[2]<0.05]) 
+                        for ur in u_results]
 
 
 

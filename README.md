@@ -15,7 +15,8 @@ full list of dependencies are as follows:
 | pandas | 0.23.4 |
 | minepy | 1.2.2 |
 
-To generate the example trajectories of Fig 6, run `run_final_scn_model.py`.
+To generate the example trajectories of Fig 6, run `run_final_scn_model.py`. 
+Note that statistical tests of this model are also performed.
 
 To perform the parameter sweep for neurotransmission pathway strength, run 
 `simulate_changing_parameter.py`, and to perform the parameter sweep for
