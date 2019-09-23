@@ -12,10 +12,7 @@ import pickle
 import numpy as np
 
 from local_imports import LimitCycle as lc
-from local_models import gonze_model as ab
 from local_models.gonze_model import param, ODEmodel, EqCount
-
-
 
 # find original period
 single_osc = lc.Oscillator(ODEmodel(), param, y0=np.ones(EqCount))
@@ -28,11 +25,10 @@ single_osc.limit_cycle()
 AVPcells = 20; VIPcells=20; NAVcells = 20
 totcells = AVPcells+VIPcells+NAVcells
 
+
 # perform sim ulation
 # switch to the many cell model
-from local_models import gonze_model_manycell as ab
-reload(ab)
-from local_models.gonze_stoch_multi_celltypes import param, GonzeModelManyCells
+from local_models.stoch_multi_celltypes import param, GonzeModelManyCells
 
 def load_trajectories(navp, nvip):
     """
