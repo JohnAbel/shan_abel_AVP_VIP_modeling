@@ -29,7 +29,7 @@ totcells = AVPcells+VIPcells+NAVcells
 
 # perform sim ulation
 # switch to the many cell model
-from local_models.gonze_stoch_multi_params import param, GonzeModelManyCells
+from local_models.stoch_multi_params import param, GonzeModelManyCells
 
 def load_trajectories(kav):
     """

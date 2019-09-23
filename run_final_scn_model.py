@@ -23,8 +23,7 @@ from matplotlib import gridspec
 
 from local_imports import LimitCycle as lc
 from local_imports import PlotOptions as plo
-from local_models import gonze_model as ab
-from local_models.gonze_model import y0in, param, ODEmodel, EqCount, ParamCount
+from local_models.gonze_model import y0in, param, ODEmodel, EqCount
 
 
 #note: up to a point, this is the same as the file for the deterministic model!
@@ -97,7 +96,7 @@ y0_random = np.array(
 
 
 # switch to the multicellular stochastic model
-from local_models.gonze_stoch_multi_params import param, GonzeModelManyCells
+from local_models.stoch_model_final import param, GonzeModelManyCells
 
 # note that these relative strengths only are about IN THE ABSENCE OF THE OTHER
 
