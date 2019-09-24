@@ -83,7 +83,7 @@ class GonzeModelManyCells(gsp.Model):
                            v8,K8,vc,Kc,K,L])
 
         # add all states as a dictionary
-        NAVcells = 40
+        NAVcells = 170
 
         state_dict = OrderedDict()
         avpcoupling = '0'

@@ -40,7 +40,7 @@ single_osc.limit_cycle()
 
 # number of each celltype
 # these and the kav are hard-coded into the model
-AVPcells = 53; VIPcells=27; NAVcells = 40
+AVPcells = 53; VIPcells=27; NAVcells = 170
 totcells = AVPcells+VIPcells+NAVcells
 
 # initial phases
@@ -181,7 +181,7 @@ try:
               'vip': vip_trajectories}
 except IOError:
     print "Final simulation does not exist yet."
-    print "Simulating 100 iterations of final model."
+    print "Simulating 5 iterations of final model, as in experiment."
     wt_trajectories = []
     avp_trajectories = []
     vip_trajectories = []
@@ -236,8 +236,8 @@ except IOError:
         returns the MIC values for one set of the SCN trajectories in question
         """
 
-        avpvipsol = trajectories[:, 1:(160+1)]
-        navsol = trajectories[:, (160+1):]
+        avpvipsol = trajectories[:, 1:(VIPcells*4+AVPcells*4+1)]
+        navsol = trajectories[:, (VIPcells*4+AVPcells*4+1):]
 
         per2 = np.hstack([avpvipsol[:, ::4], navsol[:, ::3]])
         numcells = per2.shape[1]
@@ -270,7 +270,7 @@ except IOError:
         avp.append(mic_mean)
 
     # process vip
-    print "VIP-BamelKO"
+    print "VIP-BmalKO"
     vip_traj = traj['vip']
     vip = []
     for idx, ti in enumerate(vip_traj):
